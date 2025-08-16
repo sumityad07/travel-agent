@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Travel Planner</title>
+    <style>
+        /* Basic Styling for a clean look */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 700px; text-align: center; }
+        h1 { color: #1a1a1a; }
+        textarea { width: 95%; padding: 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin-top: 20px; }
+        button { background-color: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 15px; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        #results { margin-top: 30px; text-align: left; white-space: pre-wrap; /* This preserves formatting like newlines */ background-color: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>AI Travel Itinerary Planner ✈️</h1>
+        <textarea id="query-input" rows="3" placeholder="e.g., Plan a 5-day budget trip to Paris from Delhi"></textarea>
+        <button onclick="planTrip()">Plan My Trip</button>
+        <div id="results">Your travel plan will appear here...</div>
+    </div>
+
+    <script>
+        async function planTrip() {
+            const queryInput = document.getElementById('query-input');
+            const resultsDiv = document.getElementById('results');
+            const userQuery = queryInput.value;
+
+            if (!userQuery) {
+                alert("Please enter a travel query!");
+                return;
+            }
+
+            // Show a loading message
+            resultsDiv.innerText = "🌍 Planning your trip, please wait...";
+
+            try {
+                // This is the JavaScript 'fetch' call to your Python backend
+                const response = await fetch('http://127.0.0.1:8000/plan-trip', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: userQuery })
+                });
+
+                const data = await response.json();
+                console.log("Received data:", data);
+
+                if (data.error) {
+                    resultsDiv.innerText = `Error: ${data.error}`;
+                } else {
+                    // Display the plan from the backend
+                    resultsDiv.innerText = data.plan;
+                }
+
+            } catch (error) {
+                console.error('Failed to fetch:', error);
+                resultsDiv.innerText = "Failed to connect to the backend. Is the server running?";
+            }
+        }
+    </script>
+
+</body>
+</html>
